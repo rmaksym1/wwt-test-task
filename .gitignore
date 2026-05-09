@@ -22,8 +22,7 @@ data-api/target
 *.ipr
 
 ### .env files ###
-auth-api/auth.env
-data-api/data.env
+.env
 
 ### NetBeans ###
 /nbproject/private/
