@@ -5,9 +5,11 @@ import com.origin.dto.user.login.UserLoginRequest;
 import com.origin.dto.user.login.UserLoginResponse;
 import com.origin.dto.user.registration.UserRegistrationRequest;
 import com.origin.service.impl.UserServiceImpl;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
@@ -20,12 +22,12 @@ public class UserController {
 
     @PostMapping("/register")
     @ResponseStatus(HttpStatus.CREATED)
-    UserResponse register(UserRegistrationRequest request) {
+    UserResponse register(@RequestBody @Valid UserRegistrationRequest request) {
         return userService.register(request);
     }
 
     @PostMapping("/login")
-    UserLoginResponse login(UserLoginRequest request) {
+    UserLoginResponse login(@RequestBody @Valid UserLoginRequest request) {
         return userService.login(request);
     }
 }

@@ -1,6 +1,8 @@
 package com.origin.dto.user;
 
+import java.util.UUID;
+
 public record UserResponse(
-        Long id,
+        UUID id,
         String email
 ) {}
