@@ -1,7 +1,4 @@
 # 🚀 WinWin.travel Backend Test Task
-
-## 🧠 Overview
-
 This project implements a **two-service microservice system**:
 
 - **auth-api (Service A)** → Authentication + request processing
@@ -16,7 +13,7 @@ Service B performs a simple transformation and validates internal requests.
 
 ## 📍 Table of Contents
 
-- [🏗 Architecture](#️-architecture)
+- [🏗 Architecture](#-architecture)
 - [⚙️ Tech Stack](#-tech-stack)
 - [📌 Key Features](#-key-features)
 - [🔧 Configuration](#-configuration)
