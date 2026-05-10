@@ -33,6 +33,11 @@ services:
   data-api:
     build: ./data-api
     container_name: data_api_service
+    depends_on:
+      postgres:
+        condition: service_healthy
     env_file: .env
     ports:
       - "${DATA_DOCKER_PORT}:8081"
+    environment:
+      SERVER_PORT: 8081
