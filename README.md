@@ -1,18 +1,31 @@
 # 🚀 WinWin.travel Backend Test Task
 
----
-
 ## 🧠 Overview
 
 This project implements a **two-service microservice system**:
 
-- **auth-api (Service A)** → Authentication + request orchestration
+- **auth-api (Service A)** → Authentication + request processing
 - **data-api (Service B)** → Text transformation service
 - **PostgreSQL** → persistence layer
 - **Docker Compose** → full environment orchestration
 
 Service A handles authentication and delegates processing to Service B.  
 Service B performs a simple transformation and validates internal requests.
+
+---
+
+## 📍 Table of Contents
+
+- [🏗 Architecture](#️-architecture)
+- [⚙️ Tech Stack](#-tech-stack)
+- [📌 Key Features](#-key-features)
+- [🔧 Configuration](#-configuration)
+- [🚀 How to Run](#-how-to-run)
+- [🔐 Authentication Flow](#-authentication-flow)
+- [⚡ Process Flow](#-process-flow)
+- [🔄 Service B](#-service-b-data-api)
+- [🐳 Docker Networking](#-docker-networking)
+- [🔁 End-to-End Flow](#-end-to-end-flow)
 
 ---
 
@@ -42,6 +55,37 @@ PostgreSQL
 
 ---
 
+## 📌 Key Features
+
+- Stateless authentication (JWT)
+- BCrypt password hashing
+- Resilient service-to-service communication (WebClient)
+- Secure inter-service communication (internal token validation)
+- Persistent processing logs
+- Containerized microservice architecture
+
+---
+
+## 🔧 Configuration
+You can use .env.template, or template below:
+
+```bash
+POSTGRES_USER=your_user
+POSTGRES_PASSWORD=your_password
+POSTGRES_DB=your_db
+POSTGRES_LOCAL_PORT=5433
+
+AUTH_DOCKER_PORT=8080
+DATA_DOCKER_PORT=8081
+
+INTERNAL_TOKEN=your_x_internal_token
+
+JWT_EXPIRATION=your_jwt_expiration
+JWT_SECRET=your_jwt_secret
+
+DEBUG_PORT=5005
+```
+
 ## 🚀 How to Run
 
 ### 1. Build services
@@ -50,16 +94,20 @@ PostgreSQL
 mvn -f auth-api/pom.xml clean package -DskipTests
 mvn -f data-api/pom.xml clean package -DskipTests
 ```
-2. Start system
+
+### 2. Start system
+
 ```bash
 docker compose up -d --build
 ```
-🌐 Services
+
+### 🌐 Services
+
 Service	URL
 ```bash
-auth-api	http://localhost:8080
+auth-api	http://localhost:8080 (by default)
 
-data-api	http://localhost:8081
+data-api	http://localhost:8081 (by default)
 
 postgres	localhost:5432
 ```
@@ -73,7 +121,7 @@ postgres	localhost:5432
 ```bash
 curl -X POST http://localhost:8080/api/auth/register \
 -H "Content-Type: application/json" \
--d '{"email":"test@test.com","password":"password"}'
+-d '{"email":"test@test.com","password":"password","repeatPassword":"password"}'
 ```
 #### Login
 ```bash
@@ -145,45 +193,12 @@ X-Internal-Token: <INTERNAL_TOKEN>
 
 ---
 
-## 🔧 Configuration
-You can use .env.template, or template below:
-
-```bash
-POSTGRES_USER=your_user
-POSTGRES_PASSWORD=your_password
-POSTGRES_DB=your_db
-POSTGRES_LOCAL_PORT=5433
-
-AUTH_DOCKER_PORT=8080
-DATA_DOCKER_PORT=8081
-
-INTERNAL_TOKEN=your_x_internal_token
-
-JWT_EXPIRATION=your_jwt_expiration
-JWT_SECRET=your_jwt_secret
-
-DEBUG_PORT=5005
-```
-
----
-
 ## 🐳 Docker Networking
 
 All services run in a shared Docker network.
 
 - auth-api → http://auth-api:8080
 - data-api → http://data-api:8081
-
----
-
-## 📌 Key Features
-
-- JWT authentication
-- BCrypt password hashing
-- Microservice communication via WebClient
-- Internal service-to-service security
-- Persistent processing logs
-- Fully dockerized environment
 
 ---
 
