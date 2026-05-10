@@ -24,34 +24,65 @@ Service B performs a simple transformation and validates internal requests.
 - [🔐 Authentication Flow](#-authentication-flow)
 - [⚡ Process Flow](#-process-flow)
 - [🔄 Service B](#-service-b-data-api)
-- [🐳 Docker Networking](#-docker-networking)
 - [🔁 End-to-End Flow](#-end-to-end-flow)
 
 ---
 
 ## 🏗 Architecture
 
-```bash
-Client
-↓
-auth-api (localhost:8080)
-↓ (JWT + X-Internal-Token)
-data-api (localhost:8081)
-↓
-PostgreSQL
+```text
+┌─────────┐
+│ Client  │
+└────┬────┘
+     │
+     │ Register / Login
+     ▼
+┌────────────────────┐
+│ auth-api           │
+│ JWT Authentication │
+└────┬───────────────┘
+     │
+     │ Returns JWT Token
+     ▼
+┌─────────┐
+│ Client  │
+└────┬────┘
+     │
+     │ Protected Request (Bearer JWT)
+     ▼
+┌────────────────────┐
+│ auth-api           │
+│ Request Processing │
+└────┬──────────┬────┘
+     │          ▼
+     │    ┌────────────┐
+     │    │ PostgreSQL │
+     │    └────────────┘
+     │
+     │ HTTP + X-Internal-Token
+     ▼
+┌────────────────────┐
+│ data-api           │
+│ Transformation API │
+└────┬───────────────┘
 ```
+
+#### [⬆ Back to Table of Contents](#-table-of-contents)
 
 ---
 
 ## ⚙️ Tech Stack
 
-- Java 17+
-- Spring Boot (Web, Security, Data JPA)
-- PostgreSQL
-- JWT Authentication
-- WebClient (service-to-service communication)
-- Docker / Docker Compose
-- BCrypt password hashing
+| Category      | Technologies                          |
+|---------------|---------------------------------------|
+| Language      | Java 17+                              |
+| Framework     | Spring Boot (Web, Security, Data JPA) |
+| Database      | PostgreSQL                            |
+| Security      | JWT Authentication, BCrypt            |
+| Communication | WebClient (service-to-service)        |
+| DevOps        | Docker, Docker Compose                |
+
+#### [⬆ Back to Table of Contents](#-table-of-contents)
 
 ---
 
@@ -63,6 +94,8 @@ PostgreSQL
 - Secure inter-service communication (internal token validation)
 - Persistent processing logs
 - Containerized microservice architecture
+
+#### [⬆ Back to Table of Contents](#-table-of-contents)
 
 ---
 
@@ -86,6 +119,10 @@ JWT_SECRET=your_jwt_secret
 DEBUG_PORT=5005
 ```
 
+#### [⬆ Back to Table of Contents](#-table-of-contents)
+
+---
+
 ## 🚀 How to Run
 
 ### 1. Build services
@@ -95,23 +132,26 @@ mvn -f auth-api/pom.xml clean package -DskipTests
 mvn -f data-api/pom.xml clean package -DskipTests
 ```
 
-### 2. Start system
+### Run tests (Recommended)
+
+```bash
+mvn -f auth-api/pom.xml test
+```
+
+### 2. Start docker
 
 ```bash
 docker compose up -d --build
 ```
 
-### 🌐 Services
+### 🐳 Docker Networking
 
-Service	URL
-```bash
-auth-api	http://localhost:8080 (by default)
+All services run in a shared Docker network.
 
-data-api	http://localhost:8081 (by default)
+- auth-api → http://auth-api:8080
+- data-api → http://data-api:8081
 
-postgres	localhost:5432
-```
-
+#### [⬆ Back to Table of Contents](#-table-of-contents)
 
 ---
 
@@ -130,11 +170,14 @@ curl -X POST http://localhost:8080/api/auth/login \
 -d '{"email":"test@test.com","password":"password"}'
 ```
 #### Response:
+
 ```bash
 {
   "token": "JWT_TOKEN"
 }
 ```
+
+#### [⬆ Back to Table of Contents](#-table-of-contents)
 
 ---
 
@@ -152,9 +195,11 @@ curl -X POST http://localhost:8080/api/process \
 
 ```bash
 {
-  "result": "OLLEH"
+  "text": "OLLEH"
 }
 ```
+
+#### [⬆ Back to Table of Contents](#-table-of-contents)
 
 ---
 
@@ -162,9 +207,7 @@ curl -X POST http://localhost:8080/api/process \
 
 ### Transform endpoint
 
-```bash
-POST /api/transform
-```
+`POST /api/transform`
 
 #### Headers
 
@@ -182,32 +225,20 @@ X-Internal-Token: <INTERNAL_TOKEN>
 
 #### Response
 
-```bash
+```json
 {
-  "result": "TXET"
+  "text": "TXET"
 }
 ```
 ### ❗ Security Rule
 
 #### Missing or invalid X-Internal-Token → 403 Forbidden
 
----
-
-## 🐳 Docker Networking
-
-All services run in a shared Docker network.
-
-- auth-api → http://auth-api:8080
-- data-api → http://data-api:8081
+#### [⬆ Back to Table of Contents](#-table-of-contents)
 
 ---
 
 ## 🔁 End-to-End Flow
-1. User registers
-2. User logs in → receives JWT 
-3. Calls /api/process 
-4. auth-api validates JWT 
-5. auth-api calls data-api 
-6. data-api validates internal token 
-7. result returned 
-8. log saved in database
+**User → Auth API → JWT → Process → Data API → Response**
+
+#### [⬆ Back to Table of Contents](#-table-of-contents)
