@@ -3,6 +3,7 @@ package com.authapi.dto.user.registration;
 import com.authapi.validation.FieldMatch;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+import lombok.experimental.Accessors;
 
 @FieldMatch(
         field = "password",
