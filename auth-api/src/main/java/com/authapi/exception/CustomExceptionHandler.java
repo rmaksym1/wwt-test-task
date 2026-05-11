@@ -9,8 +9,8 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.reactive.function.client.WebClientRequestException;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
-
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
@@ -29,6 +29,21 @@ public class CustomExceptionHandler {
     public ResponseEntity<Object> handleWebClientResponseException(WebClientResponseException ex) {
         return buildErrorResponse(HttpStatus.FORBIDDEN,
                 ex.getMessage());
+    }
+
+    @ExceptionHandler(IllegalStateException.class)
+    public ResponseEntity<Object> handleIllegalStateException(IllegalStateException ex) {
+        return buildErrorResponse(HttpStatus.CONFLICT,
+                ex.getMessage());
+    }
+
+    @ExceptionHandler(WebClientRequestException.class)
+    public ResponseEntity<Object> handleWebClientRequestException(WebClientRequestException ex) {
+        log.error("Data-api is unreachable: {}", ex.getMessage());
+
+        return buildErrorResponse(HttpStatus.BAD_GATEWAY,
+                "Data-api is unreachable"
+        );
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
